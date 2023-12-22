@@ -6,6 +6,7 @@ import { UploadOutlined } from "@ant-design/icons";
 import { Upload, Button, message } from "antd";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 
 export const Register = () => {
   const { signUp } = useContext(authContext);
@@ -40,11 +41,22 @@ export const Register = () => {
   };
   const { register, handleSubmit } = useForm();
   const onSubmit = async (data) => {
-    console.log(data, image);
-    await signUp(data.email, data.password, data.name, image).then((r) => {
-      message.success("Account created successfully");
+    await signUp(data.email, data.password, data.name, image).then(() => {
+      mutation.mutate(data);
     });
   };
+
+  const mutation = useMutation({
+    mutationFn: async (data) => {
+      await axios.post("http://localhost:3000/register", data).then((res) => {
+        console.log(res.data);
+      });
+    },
+    onSuccess: (data) => {
+      message.success("Account created successfully");
+      console.log(data);
+    },
+  });
   return (
     <>
       <div className="h-screen font-deca md:flex">

@@ -1,7 +1,15 @@
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import { useContext, useState } from "react";
+import { authContext } from "../context/AuthProvider.jsx";
+import { message } from "antd";
+import colors from "tailwindcss/colors.js";
 
 export const Navbar = () => {
+  const { userDetails, signOutUser } = useContext(authContext);
+  const [navBackground, setNavBackground] = useState(false);
+  console.log(userDetails);
+  console.log(navBackground);
   return (
     <>
       <div className=" text-white bg-transparent">
@@ -14,9 +22,15 @@ export const Navbar = () => {
                 className="h-12 w-12 lg:h-16 lg:w-16"
               />
             </NavLink>
-            <p className="lg:text-2xl text-xl  font-deca  font-bold leading-none">
-              Team Work<span className={"font-bold text-softBlue "}>.</span>
-            </p>
+            {navBackground ? (
+              <p className="lg:text-2xl text-xl  font-deca  font-bold leading-none">
+                Team Work<span className={"font-bold text-softBlue "}>.</span>
+              </p>
+            ) : (
+              <p className="lg:text-2xl text-xl text-softBlue  font-deca  font-bold leading-none">
+                Team Work<span className={"font-bold text-softBlue "}>.</span>
+              </p>
+            )}
           </div>
           <div className="lg:hidden">
             <button className="navbar-burger flex items-center text-blue-600 p-3">
@@ -32,9 +46,19 @@ export const Navbar = () => {
           </div>
           <ul className="hidden absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2 lg:flex lg:mx-auto  lg:items-center lg:w-auto lg:space-x-6">
             <li>
-              <a className="text-sm text-gray-400 hover:text-gray-500" href="#">
+              <NavLink
+                to={"/"}
+                className="text-sm text-gray-400 hover:text-gray-500"
+                style={({ isActive }) => {
+                  if (isActive) {
+                    return setNavBackground(true);
+                  } else {
+                    return setNavBackground(false);
+                  }
+                }}
+              >
                 Home
-              </a>
+              </NavLink>
             </li>
             <li className="text-gray-300">
               <svg
@@ -47,11 +71,17 @@ export const Navbar = () => {
                 <path d="M12 5v0m0 7v0m0 7v0m0-13a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
               </svg>
             </li>
-            <li>
-              <a className="text-sm text-blue-600 font-bold" href="#">
-                About Us
-              </a>
-            </li>
+            <NavLink
+              to={"/task"}
+              className="text-sm text-gray-400 hover:text-gray-500"
+              style={({ isActive }) => {
+                if (isActive) {
+                  return { color: "#5468E7" };
+                }
+              }}
+            >
+              Task Manage
+            </NavLink>
             <li className="text-gray-300">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -86,12 +116,26 @@ export const Navbar = () => {
             </li>
           </ul>
 
-          <NavLink
-            to={"/register"}
-            className="hidden  lg:block py-2 px-6 text-sm text-white font-bold rounded-xl bg-softBlue  transition duration-200"
-          >
-            Sign up
-          </NavLink>
+          {userDetails ? (
+            <button
+              onClick={() =>
+                signOutUser().then(() =>
+                  message.success("Logged Out Successfully"),
+                )
+              }
+              className="block px-4 py-3 mb-2 leading-loose text-xs text-center text-white font-semibold bg-blue-600 hover:bg-blue-700  rounded-xl"
+            >
+              Log Out
+            </button>
+          ) : (
+            <NavLink
+              className="block px-4 py-3 mb-2 leading-loose text-xs text-center text-white font-semibold bg-blue-600 hover:bg-blue-700  rounded-xl"
+              href="#"
+              to={"/register"}
+            >
+              Sign Up
+            </NavLink>
+          )}
         </nav>
         <div className="navbar-menu relative z-50 hidden">
           <div className="navbar-backdrop fixed inset-0 bg-gray-800 opacity-25"></div>
@@ -163,19 +207,19 @@ export const Navbar = () => {
             </div>
             <div className="mt-auto">
               <div className="pt-6">
-                <a
-                  className="block px-4 py-3 mb-3 leading-loose text-xs text-center font-semibold  bg-gray-50 hover:bg-gray-100 rounded-xl"
-                  href="#"
-                >
-                  Sign in
-                </a>
-                <NavLink
-                  className="block px-4 py-3 mb-2 leading-loose text-xs text-center text-white font-semibold bg-blue-600 hover:bg-blue-700  rounded-xl"
-                  href="#"
-                  to={"/register"}
-                >
-                  Sign Up
-                </NavLink>
+                {userDetails ? (
+                  <button className="block px-4 py-3 mb-3 leading-loose text-xs text-center font-semibold  bg-gray-50 hover:bg-gray-100 rounded-xl">
+                    Log Out
+                  </button>
+                ) : (
+                  <NavLink
+                    className="block px-4 py-3 mb-2 leading-loose text-xs text-center text-white font-semibold bg-blue-600 hover:bg-blue-700  rounded-xl"
+                    href="#"
+                    to={"/register"}
+                  >
+                    Sign Up
+                  </NavLink>
+                )}
               </div>
               <p className="my-4 text-xs text-center text-gray-400">
                 <span>Copyright © 2021</span>
